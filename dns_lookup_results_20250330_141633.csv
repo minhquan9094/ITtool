@@ -1,0 +1,19 @@
+Input,LookupType,Result,Status,ErrorMessage,DnsServerUsed
+# Sample Input File for DNS Lookup Scripts,Forward (Hostname -> IP),Not Found,FAILED,NXDOMAIN (No such domain),8.8.8.8
+"# You can use comments starting with # (though the scripts don't specifically ignore them, empty lines are skipped)",Forward (Hostname -> IP),Error,ERROR,Unexpected error: LabelTooLong - A DNS label is > 63 octets long.,8.8.8.8
+google.com,Forward (Hostname -> IP),142.250.198.174,SUCCESS,,8.8.8.8
+8.8.8.8,Reverse (IP -> Hostname),dns.google,SUCCESS,,8.8.8.8
+1.1.1.1,Reverse (IP -> Hostname),one.one.one.one,SUCCESS,,8.8.8.8
+cloudflare.com,Forward (Hostname -> IP),104.16.133.229; 104.16.132.229,SUCCESS,,8.8.8.8
+github.com,Forward (Hostname -> IP),20.205.243.166,SUCCESS,,8.8.8.8
+microsoft.com,Forward (Hostname -> IP),13.107.246.59,SUCCESS,,8.8.8.8
+# Example private IP (resolution depends on your local network DNS / the DNS server used),Forward (Hostname -> IP),Error,ERROR,Unexpected error: LabelTooLong - A DNS label is > 63 octets long.,8.8.8.8
+192.168.1.1,Reverse (IP -> Hostname),Not Found,FAILED,NXDOMAIN (No such domain for reverse lookup),8.8.8.8
+10.0.0.5,Reverse (IP -> Hostname),Not Found,FAILED,NXDOMAIN (No such domain for reverse lookup),8.8.8.8
+# Example likely to fail,Forward (Hostname -> IP),Not Found,FAILED,NXDOMAIN (No such domain),8.8.8.8
+thisshouldnotresolve.invalid,Forward (Hostname -> IP),Not Found,FAILED,NXDOMAIN (No such domain),8.8.8.8
+another-fake-domain.local,Forward (Hostname -> IP),Not Found,FAILED,NXDOMAIN (No such domain),8.8.8.8
+# Example IP for reverse lookup (PTR record might exist),Forward (Hostname -> IP),Not Found,FAILED,NXDOMAIN (No such domain),8.8.8.8
+208.67.222.222,Reverse (IP -> Hostname),dns.sse.cisco.com; dns.opendns.com; dns.umbrella.com; resolver1.opendns.com,SUCCESS,,8.8.8.8
+# Another common domain,Forward (Hostname -> IP),Not Found,FAILED,NXDOMAIN (No such domain),8.8.8.8
+wikipedia.org,Forward (Hostname -> IP),103.102.166.224,SUCCESS,,8.8.8.8

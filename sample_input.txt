@@ -1,0 +1,23 @@
+# Sample Input File for DNS Lookup Scripts
+# You can use comments starting with # (though the scripts don't specifically ignore them, empty lines are skipped)
+
+google.com
+8.8.8.8
+1.1.1.1
+cloudflare.com
+github.com
+microsoft.com
+
+# Example private IP (resolution depends on your local network DNS / the DNS server used)
+192.168.1.1
+10.0.0.5
+
+# Example likely to fail
+thisshouldnotresolve.invalid
+another-fake-domain.local
+
+# Example IP for reverse lookup (PTR record might exist)
+208.67.222.222
+
+# Another common domain
+wikipedia.org

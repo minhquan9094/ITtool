@@ -1,0 +1,9 @@
+Input,LookupType,Result,Status,ErrorMessage,DnsServerUsed
+google.com,Forward (Hostname -> IP),142.250.197.46,SUCCESS,,8.8.8.8; 8.8.4.4
+8.8.8.8,Reverse (IP -> Hostname),dns.google,SUCCESS,,8.8.8.8; 8.8.4.4
+192.168.1.1,Reverse (IP -> Hostname),Not Found,FAILED,NXDOMAIN (No such domain for reverse lookup),8.8.8.8; 8.8.4.4
+github.com,Forward (Hostname -> IP),20.205.243.166,SUCCESS,,8.8.8.8; 8.8.4.4
+1.1.1.1,Reverse (IP -> Hostname),one.one.one.one,SUCCESS,,8.8.8.8; 8.8.4.4
+cloudflare.com,Forward (Hostname -> IP),104.16.132.229; 104.16.133.229,SUCCESS,,8.8.8.8; 8.8.4.4
+nonexistentdomain.local,Forward (Hostname -> IP),Not Found,FAILED,NXDOMAIN (No such domain),8.8.8.8; 8.8.4.4
+10.0.0.50,Reverse (IP -> Hostname),Not Found,FAILED,NXDOMAIN (No such domain for reverse lookup),8.8.8.8; 8.8.4.4
