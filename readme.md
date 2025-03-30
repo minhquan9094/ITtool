@@ -1,4 +1,3 @@
-Okay, here is a summary of how to use the Python and PowerShell DNS lookup scripts, formatted in Markdown.
 
 # How to Use the DNS Lookup Scripts
 
