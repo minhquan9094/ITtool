@@ -1,0 +1,10 @@
+Timestamp,TargetHost,Service,Status,Details
+2025-04-05 22:55:17,google.com,ping,SUCCESS,Responded to ICMP echo request
+2025-04-05 22:55:17,google.com,https,SUCCESS,HTTP Status 200
+2025-04-05 22:55:17,github.com,https,SUCCESS,HTTP Status 200
+2025-04-05 22:55:18,192.168.1.1,ping,SUCCESS,Responded to ICMP echo request
+2025-04-05 22:55:18,webserver.local,http,FAILED,DNS Resolution Error
+2025-04-05 22:55:28,webserver.local,https,FAILED,DNS Resolution Error
+2025-04-05 22:55:38,nonexistent.internal.lan,ping,FAILED,DNS Resolution Error
+2025-04-05 22:55:38,nonexistent.internal.lan,http,FAILED,DNS Resolution Error
+2025-04-05 22:55:38,badconfig.local,# test skipping entry with no services,SKIPPED,Unknown service type
