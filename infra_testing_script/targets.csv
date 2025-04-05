@@ -2,7 +2,4 @@ hostname,services
 google.com,"ping,https"
 github.com,"https"
 192.168.1.1,ping
-webserver.local,"http,https"
-nonexistent.internal.lan,"ping,http"
-badconfig.local, # Test skipping entry with no services
-#another-server.com,ping # Lines starting with # are ignored
+192.168.10.57,"ping,tcp:3389,tcp:3000"
