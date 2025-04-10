@@ -1,0 +1,9 @@
+Timestamp,TargetHost,Service,Status,Details
+2025-04-07 21:26:53,apps-vn-at.sunlifecorp.com,ping,SUCCESS,Responded to ICMP echo request
+2025-04-07 21:26:56,apps-vn-at.sunlifecorp.com,https,SUCCESS,HTTP Status 200
+2025-04-07 21:26:57,apps-vn-st.sunlifecorp.com,ping,SUCCESS,Responded to ICMP echo request
+2025-04-07 21:26:59,apps-vn-st.sunlifecorp.com,https,SUCCESS,HTTP Status 200
+2025-04-07 21:27:00,online-vn-st2.sunlifecorp.com,ping,SUCCESS,Responded to ICMP echo request
+2025-04-07 21:27:02,online-vn-st2.sunlifecorp.com,https,SUCCESS,HTTP Status 200
+2025-04-07 21:27:03,sv84935.sunlifecorp.com,ping,SUCCESS,Responded to ICMP echo request
+2025-04-07 21:27:04,sv84935.sunlifecorp.com,tcp:8443,SUCCESS,Port 8443 is open

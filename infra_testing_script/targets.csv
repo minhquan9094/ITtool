@@ -1,5 +1,5 @@
 hostname,services
-google.com,"ping,https"
-github.com,"https"
-192.168.1.1,ping
-192.168.10.57,"ping,tcp:3389,tcp:3000"
+apps-vn-at.sunlifecorp.com,"ping,https"
+apps-vn-st.sunlifecorp.com,"ping,https"
+online-vn-st2.sunlifecorp.com,"ping,https"
+sv84935.sunlifecorp.com,"ping,tcp:8443"

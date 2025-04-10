@@ -17,7 +17,8 @@ import os
 import colorama # Import colorama
 from colorama import Fore, Style # Import specific objects
 from datetime import datetime # For timestamp
-
+import warnings
+warnings.filterwarnings("ignore")
 # --- Initialize Colorama ---
 colorama.init(autoreset=True)
 
@@ -121,7 +122,7 @@ def test_http_https(hostname, service_type='https', timeout=REQUEST_TIMEOUT):
     service_tag = f"[{service_type.upper()}]"
 
     try:
-        verify_ssl = True # Set to False for self-signed certs (use with caution)
+        verify_ssl = False # Set to False for self-signed certs (use with caution)
         headers = {'User-Agent': 'Python-NetworkTestScript/1.3'} # Version bump
 
         response = requests.get(

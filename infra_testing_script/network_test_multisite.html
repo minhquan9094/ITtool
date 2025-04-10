@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Test Runner (Multi-Site)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        /* Style file input button */
+        input[type="file"]::file-selector-button { margin-right: 0.5rem; display: inline-block; font-weight: 500; border-radius: 0.375rem; font-size: 0.875rem; padding: 0.5rem 0.75rem; border-width: 1px; border-color: transparent; color: #ffffff; background-color: #4f46e5; cursor: pointer; transition: background-color 0.15s ease-in-out; }
+        input[type="file"]::file-selector-button:hover { background-color: #4338ca; }
+        /* Simple spinner */
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #4f46e5; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 1rem auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Result Table Styles */
+        #resultsTable th, #resultsTable td { padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; text-align: left; font-size: 0.875rem; }
+        #resultsTable th { background-color: #f9fafb; font-weight: 600; }
+        .status-success { color: #16a34a; font-weight: 500; } /* Green-600 */
+        .status-failed { color: #dc2626; font-weight: 500; } /* Red-600 */
+        .status-skipped { color: #ca8a04; font-weight: 500; } /* Yellow-600 */
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Network Test Runner (Multi-Site)</h1>
+
+        <div class="space-y-6">
+
+            <div>
+                <label for="backendSelector" class="block text-sm font-medium text-gray-700">Select Target Site (Backend Server):</label>
+                <select id="backendSelector" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-white">
+                    <option value="" disabled selected>-- Select a site --</option>
+                </select>
+                 <p class="mt-1 text-xs text-gray-500">Ensure the selected backend server is running and accessible.</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Input Method:</label>
+                <div class="flex items-center space-x-4">
+                    <label class="flex items-center">
+                        <input type="radio" name="inputMethod" value="single" checked class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                        <span class="ml-2 text-sm text-gray-700">Single Target</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="inputMethod" value="csv" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                        <span class="ml-2 text-sm text-gray-700">CSV File Upload</span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="singleTargetInputs" class="space-y-4 border p-4 rounded-md bg-gray-50">
+                 <h3 class="text-md font-semibold text-gray-700 mb-2">Single Target Details</h3>
+                <div>
+                    <label for="hostInput" class="block text-sm font-medium text-gray-700">Hostname or IP:</label>
+                    <input type="text" id="hostInput" placeholder="e.g., google.com or 192.168.1.1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+                </div>
+                <div>
+                    <label for="servicesInput" class="block text-sm font-medium text-gray-700">Services (comma-separated):</label>
+                    <input type="text" id="servicesInput" placeholder="e.g., ping,https,tcp:22" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+                    <p class="mt-1 text-xs text-gray-500">Use 'ping', 'http', 'https', or 'tcp:&lt;port&gt;'.</p>
+                </div>
+            </div>
+
+            <div id="csvInput" class="hidden space-y-4 border p-4 rounded-md bg-gray-50">
+                 <h3 class="text-md font-semibold text-gray-700 mb-2">CSV File Input</h3>
+                 <div>
+                    <label for="csvFileInput" class="block text-sm font-medium text-gray-700">Upload CSV File:</label>
+                    <input type="file" id="csvFileInput" accept=".csv" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                     <p class="mt-1 text-xs text-gray-500">CSV must have 'hostname,services' header. Content will be sent to backend.</p>
+                     <p id="csvFileNameDisplay" class="mt-1 text-sm text-gray-600 font-medium"></p>
+                </div>
+            </div>
+
+             <div>
+                <label for="outputFilenameInput" class="block text-sm font-medium text-gray-700">Save Results to File on Server (Optional):</label>
+                <input type="text" id="outputFilenameInput" placeholder="e.g., site_a_results.csv" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+                 <p class="mt-1 text-xs text-gray-500">If provided, the backend server will attempt to save results to this filename in its designated results directory.</p>
+            </div>
+
+
+            <div class="text-center pt-4">
+                <button id="runTestsBtn" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/play.svg" alt="" class="h-5 w-5 mr-2"/>
+                    Run Tests on Selected Site
+                </button>
+            </div>
+        </div>
+
+        <div id="resultsContainer" class="mt-8 border-t pt-6 hidden">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Test Results</h2>
+            <div id="loadingIndicator" class="hidden loader"></div>
+            <div id="errorDisplay" class="hidden p-3 mb-4 bg-red-100 border border-red-300 text-red-800 rounded-md text-sm"></div>
+             <div id="fileSaveStatus" class="hidden p-3 mb-4 bg-blue-100 border border-blue-300 text-blue-800 rounded-md text-sm"></div>
+            <div class="overflow-x-auto">
+                <table id="resultsTable" class="min-w-full border-collapse hidden">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Target Host</th>
+                            <th>Service</th>
+                            <th>Status</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration: Backend Server URLs ---
+        const backendServers = {
+            "Local Test Server": "http://127.0.0.1:5000",
+            "Site A - Production": "http://10.10.1.5:5000", // Example internal IP
+            "Site B - Staging": "http://app-be-siteb.internal.example.com:5000", // Example internal hostname
+        };
+        // --- End Configuration ---
+
+
+        // --- DOM Elements ---
+        const backendSelector = document.getElementById('backendSelector');
+        const singleTargetInputs = document.getElementById('singleTargetInputs');
+        const csvInput = document.getElementById('csvInput'); // Get CSV section div
+        const hostInput = document.getElementById('hostInput');
+        const servicesInput = document.getElementById('servicesInput');
+        const csvFileInput = document.getElementById('csvFileInput'); // Get file input
+        const csvFileNameDisplay = document.getElementById('csvFileNameDisplay');
+        const outputFilenameInput = document.getElementById('outputFilenameInput'); // Get output filename input
+        const runTestsBtn = document.getElementById('runTestsBtn');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const errorDisplay = document.getElementById('errorDisplay');
+        const fileSaveStatus = document.getElementById('fileSaveStatus'); // Get file save status div
+        const resultsTable = document.getElementById('resultsTable');
+        const resultsTableBody = document.getElementById('resultsTableBody');
+        let csvFileContent = null; // Variable to store CSV content
+
+        // --- Populate Backend Selector ---
+        function populateBackendSelector() {
+            backendSelector.innerHTML = '<option value="" disabled selected>-- Select a site --</option>';
+            for (const siteName in backendServers) {
+                const option = document.createElement('option');
+                option.value = backendServers[siteName];
+                option.textContent = siteName;
+                backendSelector.appendChild(option);
+            }
+        }
+
+         // --- Handle Input Method Change ---
+        document.querySelectorAll('input[name="inputMethod"]').forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                if (event.target.value === 'single') {
+                    singleTargetInputs.classList.remove('hidden');
+                    csvInput.classList.add('hidden');
+                } else { // CSV selected
+                    singleTargetInputs.classList.add('hidden');
+                    csvInput.classList.remove('hidden');
+                }
+            });
+        });
+
+        // --- Handle CSV File Selection ---
+        csvFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                csvFileNameDisplay.textContent = `Selected file: ${file.name}`;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    csvFileContent = e.target.result; // Store file content
+                    // console.log("CSV Content Loaded:", csvFileContent); // Debug
+                };
+                reader.onerror = (e) => {
+                    console.error("Error reading file:", e);
+                    csvFileContent = null;
+                    csvFileNameDisplay.textContent = `Error reading file: ${file.name}`;
+                    alert("Error reading the selected CSV file.");
+                };
+                reader.readAsText(file); // Read the file as text
+            } else {
+                 csvFileContent = null;
+                 csvFileNameDisplay.textContent = '';
+            }
+        });
+
+
+        // --- Run Tests Button Click ---
+        runTestsBtn.addEventListener('click', async () => {
+            // Clear previous results and errors, show loading
+            resultsTableBody.innerHTML = '';
+            resultsTable.classList.add('hidden');
+            errorDisplay.classList.add('hidden');
+            errorDisplay.textContent = '';
+            fileSaveStatus.classList.add('hidden'); // Hide file save status
+            fileSaveStatus.textContent = '';
+            resultsContainer.classList.remove('hidden');
+            loadingIndicator.classList.remove('hidden');
+            runTestsBtn.disabled = true;
+
+            try {
+                // --- Get Selected Backend URL ---
+                const selectedBackendUrl = backendSelector.value;
+                if (!selectedBackendUrl) {
+                    throw new Error('Please select a target site (backend server) first.');
+                }
+                const apiUrl = selectedBackendUrl.replace(/\/$/, '') + '/test';
+
+                // --- Get Test Parameters ---
+                const inputMethod = document.querySelector('input[name="inputMethod"]:checked').value;
+                const outputFilename = outputFilenameInput.value.trim(); // Get desired output filename
+                let requestPayload = {};
+
+                // Add output filename if provided
+                if (outputFilename) {
+                    requestPayload.output_filename = outputFilename;
+                }
+
+                if (inputMethod === 'single') {
+                    const host = hostInput.value.trim();
+                    const servicesStr = servicesInput.value.trim();
+                    if (!host || !servicesStr) {
+                        throw new Error('Please provide both Hostname/IP and Services for Single Target input.');
+                    }
+                    const servicesList = servicesStr.split(',').map(s => s.trim()).filter(s => s);
+                    if (!servicesList.length) {
+                         throw new Error('Please provide valid services.');
+                    }
+                    requestPayload.host = host;
+                    requestPayload.services = servicesList;
+                } else { // CSV input
+                    if (!csvFileContent) {
+                         throw new Error('Please select a CSV file or wait for it to load.');
+                    }
+                    requestPayload.csv_data = csvFileContent; // Send CSV content
+                }
+
+                // --- Make API Call to Selected Backend ---
+                console.log(`Sending request to: ${apiUrl}`, requestPayload); // Debug log
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestPayload),
+                });
+
+                loadingIndicator.classList.add('hidden');
+
+                // --- Process Response ---
+                // Try parsing JSON regardless of response.ok to get potential error messages
+                let responseData;
+                try {
+                     responseData = await response.json();
+                } catch (jsonError) {
+                    // If JSON parsing fails, throw error with status text
+                     throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}. Could not parse server response.`);
+                }
+
+                if (!response.ok) {
+                    // Use error message from parsed JSON if available
+                    const errorMsg = responseData.error || `Unknown server error (Status: ${response.status})`;
+                    throw new Error(`Backend Error targeting ${selectedBackendUrl}: ${errorMsg}`);
+                }
+
+                 // --- Display Results and File Save Status ---
+                if (responseData.results && Array.isArray(responseData.results)) {
+                     displayResults(responseData.results);
+                } else {
+                     // Handle cases where results might be missing but response was ok
+                     console.warn("Received OK response but missing 'results' array:", responseData);
+                     errorDisplay.textContent = 'Received OK response from backend, but no test results data was found.';
+                     errorDisplay.classList.remove('hidden');
+                }
+
+                // Display file save status if provided by backend
+                if (responseData.file_save_status) {
+                    fileSaveStatus.textContent = `Server File Save: ${responseData.file_save_status}`;
+                    fileSaveStatus.classList.remove('hidden');
+                     // Optionally style based on success/failure if backend provides more detail
+                    if (responseData.file_save_status.toLowerCase().includes("error") || responseData.file_save_status.toLowerCase().includes("failed")) {
+                        fileSaveStatus.classList.remove('bg-blue-100', 'border-blue-300', 'text-blue-800');
+                        fileSaveStatus.classList.add('bg-red-100', 'border-red-300', 'text-red-800');
+                    } else {
+                         fileSaveStatus.classList.remove('bg-red-100', 'border-red-300', 'text-red-800');
+                        fileSaveStatus.classList.add('bg-blue-100', 'border-blue-300', 'text-blue-800');
+                    }
+                }
+
+
+            } catch (error) {
+                console.error('Error running tests:', error);
+                loadingIndicator.classList.add('hidden');
+                if (error.message.includes('Failed to fetch')) {
+                     errorDisplay.textContent = `Network Error: Could not connect to the selected backend (${backendSelector.value}). Please ensure it's running, accessible, and CORS is configured. Check browser console (F12) for more details.`;
+                } else {
+                     errorDisplay.textContent = `Error: ${error.message || 'Could not process request.'}`;
+                }
+                errorDisplay.classList.remove('hidden');
+            } finally {
+                 runTestsBtn.disabled = false;
+            }
+        });
+
+        // --- Function to Display Results in Table ---
+        function displayResults(results) {
+             if (!results || !Array.isArray(results)) {
+                console.error("Invalid results format received from backend:", results);
+                errorDisplay.textContent = 'Received invalid results format from the backend.';
+                errorDisplay.classList.remove('hidden');
+                return;
+            }
+            if (results.length === 0) {
+                // Don't show as an error if file save status is present, maybe just no tests ran
+                if (!fileSaveStatus.textContent) {
+                    errorDisplay.textContent = 'No test results returned (check backend logs?).';
+                    errorDisplay.classList.remove('hidden');
+                }
+                return; // Don't display empty table
+            }
+
+            results.forEach(result => {
+                const row = resultsTableBody.insertRow();
+                row.insertCell().textContent = result.Timestamp || 'N/A';
+                row.insertCell().textContent = result.TargetHost || 'N/A';
+                row.insertCell().textContent = result.Service || 'N/A';
+
+                const statusCell = row.insertCell();
+                statusCell.textContent = result.Status || 'N/A';
+                if (result.Status === 'SUCCESS') statusCell.className = 'status-success';
+                else if (result.Status === 'FAILED') statusCell.className = 'status-failed';
+                else if (result.Status === 'SKIPPED') statusCell.className = 'status-skipped';
+
+                row.insertCell().textContent = result.Details || '';
+            });
+
+            resultsTable.classList.remove('hidden');
+        }
+
+        // --- Initial Setup ---
+        populateBackendSelector(); // Populate dropdown on page load
+
+    </script>
+
+</body>
+</html>
